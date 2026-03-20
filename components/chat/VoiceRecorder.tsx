@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Mic, MicOff, Trash2 } from "lucide-react";
+import { Mic, MicOff, Send, Trash2 } from "lucide-react";
 import { cn, formatDuration } from "@/lib/utils";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 
@@ -93,8 +93,20 @@ export function VoiceRecorder({ onSend, disabled = false }: VoiceRecorderProps) 
                 ))}
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between gap-3">
+                {/* Trash — izquierda, gris apenas perceptible, ícono rojo */}
+                <motion.button
+                  onClick={cancelRecording}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-slate-100/70 text-red-500 transition-colors hover:bg-slate-200/70"
+                  aria-label="Cancelar"
+                >
+                  <Trash2 className="h-5 w-5" />
+                </motion.button>
+
+                {/* Info — centro */}
+                <div className="flex flex-1 items-center justify-center gap-2">
                   <motion.span
                     className="h-2 w-2 rounded-full bg-red-400"
                     animate={{ opacity: [1, 0.2, 1] }}
@@ -108,22 +120,16 @@ export function VoiceRecorder({ onSend, disabled = false }: VoiceRecorderProps) 
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={cancelRecording}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-slate-200 transition-colors"
-                    aria-label="Cancelar"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={handleSend}
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-600 text-white shadow-md hover:bg-brand-700 transition-all active:scale-95"
-                    aria-label="Enviar"
-                  >
-                    <Mic className="h-4 w-4" />
-                  </button>
-                </div>
+                {/* Enviar — derecha, azul */}
+                <motion.button
+                  onClick={handleSend}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-brand-600 text-white shadow-lg shadow-brand-200 transition-colors hover:bg-brand-700"
+                  aria-label="Enviar"
+                >
+                  <Send className="h-5 w-5 translate-x-[1px]" />
+                </motion.button>
               </div>
             </motion.div>
           ) : (
