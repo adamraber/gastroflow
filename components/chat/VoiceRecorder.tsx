@@ -134,12 +134,40 @@ export function VoiceRecorder({ onSend, disabled = false }: VoiceRecorderProps) 
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="px-4 pt-4 pb-3"
+              className="flex flex-col items-center gap-3 px-4 py-5"
             >
-              {/* Placeholder text */}
+              {/* Mic button — centered */}
+              <div className="relative">
+                {!disabled && hasPermission !== false && (
+                  <span className="absolute inset-0 rounded-full bg-brand-400 opacity-20 animate-pulse-ring" />
+                )}
+                <motion.button
+                  onPointerDown={handleMicPress}
+                  onPointerUp={handleSend}
+                  onPointerLeave={() => { if (isRecording) handleSend(); }}
+                  disabled={disabled || hasPermission === false}
+                  whileTap={{ scale: 0.88 }}
+                  transition={{ type: "spring", stiffness: 380, damping: 18 }}
+                  className={cn(
+                    "no-select relative flex h-14 w-14 items-center justify-center rounded-full shadow-md transition-colors",
+                    disabled || hasPermission === false
+                      ? "cursor-not-allowed bg-slate-200 text-slate-400 shadow-none"
+                      : "cursor-pointer bg-brand-600 text-white shadow-brand-200 hover:bg-brand-700"
+                  )}
+                  aria-label="Grabar mensaje de voz"
+                >
+                  {hasPermission === false ? (
+                    <MicOff className="h-5 w-5" />
+                  ) : (
+                    <Mic className="h-5 w-5" />
+                  )}
+                </motion.button>
+              </div>
+
+              {/* Label — centered */}
               <p
                 className={cn(
-                  "text-[15px] leading-relaxed mb-8",
+                  "text-center text-[13px]",
                   error
                     ? "text-red-400"
                     : disabled
@@ -151,44 +179,8 @@ export function VoiceRecorder({ onSend, disabled = false }: VoiceRecorderProps) 
                   ? error
                   : disabled
                     ? "Procesando respuesta..."
-                    : "Grabá tu mensaje de voz..."}
+                    : "Presioná para grabar el mensaje"}
               </p>
-
-              {/* Bottom row: hint + mic button */}
-              <div className="flex items-center justify-between">
-                <p className="text-[11px] text-slate-300 select-none">
-                  {!disabled && hasPermission !== false
-                    ? "Presioná el mic para grabar"
-                    : ""}
-                </p>
-
-                <div className="relative">
-                  {!disabled && hasPermission !== false && (
-                    <span className="absolute inset-0 rounded-full bg-brand-400 opacity-20 animate-pulse-ring" />
-                  )}
-                  <motion.button
-                    onPointerDown={handleMicPress}
-                    onPointerUp={handleSend}
-                    onPointerLeave={() => { if (isRecording) handleSend(); }}
-                    disabled={disabled || hasPermission === false}
-                    whileTap={{ scale: 0.88 }}
-                    transition={{ type: "spring", stiffness: 380, damping: 18 }}
-                    className={cn(
-                      "no-select relative flex h-10 w-10 items-center justify-center rounded-full shadow-md transition-colors",
-                      disabled || hasPermission === false
-                        ? "cursor-not-allowed bg-slate-200 text-slate-400 shadow-none"
-                        : "cursor-pointer bg-brand-600 text-white shadow-brand-200 hover:bg-brand-700"
-                    )}
-                    aria-label="Grabar mensaje de voz"
-                  >
-                    {hasPermission === false ? (
-                      <MicOff className="h-4.5 w-4.5" />
-                    ) : (
-                      <Mic className="h-4.5 w-4.5" />
-                    )}
-                  </motion.button>
-                </div>
-              </div>
             </motion.div>
           )}
         </AnimatePresence>

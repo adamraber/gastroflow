@@ -883,82 +883,65 @@ function VoiceRecorder({ onSend, disabled = false }) {
                     transition: {
                         duration: 0.15
                     },
-                    className: "px-4 pt-4 pb-3",
+                    className: "flex flex-col items-center gap-3 px-4 py-5",
                     children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                            className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["cn"])("text-[15px] leading-relaxed mb-8", error ? "text-red-400" : disabled ? "text-slate-300" : "text-slate-400"),
-                            children: error ? error : disabled ? "Procesando respuesta..." : "Grabá tu mensaje de voz..."
-                        }, void 0, false, {
-                            fileName: "[project]/components/chat/VoiceRecorder.tsx",
-                            lineNumber: 140,
-                            columnNumber: 15
-                        }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "flex items-center justify-between",
+                            className: "relative",
                             children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    className: "text-[11px] text-slate-300 select-none",
-                                    children: !disabled && hasPermission !== false ? "Presioná el mic para grabar" : ""
+                                !disabled && hasPermission !== false && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    className: "absolute inset-0 rounded-full bg-brand-400 opacity-20 animate-pulse-ring"
                                 }, void 0, false, {
                                     fileName: "[project]/components/chat/VoiceRecorder.tsx",
-                                    lineNumber: 159,
-                                    columnNumber: 17
+                                    lineNumber: 142,
+                                    columnNumber: 19
                                 }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "relative",
-                                    children: [
-                                        !disabled && hasPermission !== false && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "absolute inset-0 rounded-full bg-brand-400 opacity-20 animate-pulse-ring"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/chat/VoiceRecorder.tsx",
-                                            lineNumber: 167,
-                                            columnNumber: 21
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].button, {
-                                            onPointerDown: handleMicPress,
-                                            onPointerUp: handleSend,
-                                            onPointerLeave: ()=>{
-                                                if (isRecording) handleSend();
-                                            },
-                                            disabled: disabled || hasPermission === false,
-                                            whileTap: {
-                                                scale: 0.88
-                                            },
-                                            transition: {
-                                                type: "spring",
-                                                stiffness: 380,
-                                                damping: 18
-                                            },
-                                            className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["cn"])("no-select relative flex h-10 w-10 items-center justify-center rounded-full shadow-md transition-colors", disabled || hasPermission === false ? "cursor-not-allowed bg-slate-200 text-slate-400 shadow-none" : "cursor-pointer bg-brand-600 text-white shadow-brand-200 hover:bg-brand-700"),
-                                            "aria-label": "Grabar mensaje de voz",
-                                            children: hasPermission === false ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$mic$2d$off$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__MicOff$3e$__["MicOff"], {
-                                                className: "h-4.5 w-4.5"
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/chat/VoiceRecorder.tsx",
-                                                lineNumber: 185,
-                                                columnNumber: 23
-                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$mic$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Mic$3e$__["Mic"], {
-                                                className: "h-4.5 w-4.5"
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/chat/VoiceRecorder.tsx",
-                                                lineNumber: 187,
-                                                columnNumber: 23
-                                            }, this)
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/chat/VoiceRecorder.tsx",
-                                            lineNumber: 169,
-                                            columnNumber: 19
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].button, {
+                                    onPointerDown: handleMicPress,
+                                    onPointerUp: handleSend,
+                                    onPointerLeave: ()=>{
+                                        if (isRecording) handleSend();
+                                    },
+                                    disabled: disabled || hasPermission === false,
+                                    whileTap: {
+                                        scale: 0.88
+                                    },
+                                    transition: {
+                                        type: "spring",
+                                        stiffness: 380,
+                                        damping: 18
+                                    },
+                                    className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["cn"])("no-select relative flex h-14 w-14 items-center justify-center rounded-full shadow-md transition-colors", disabled || hasPermission === false ? "cursor-not-allowed bg-slate-200 text-slate-400 shadow-none" : "cursor-pointer bg-brand-600 text-white shadow-brand-200 hover:bg-brand-700"),
+                                    "aria-label": "Grabar mensaje de voz",
+                                    children: hasPermission === false ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$mic$2d$off$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__MicOff$3e$__["MicOff"], {
+                                        className: "h-5 w-5"
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/chat/VoiceRecorder.tsx",
+                                        lineNumber: 160,
+                                        columnNumber: 21
+                                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$mic$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Mic$3e$__["Mic"], {
+                                        className: "h-5 w-5"
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/chat/VoiceRecorder.tsx",
+                                        lineNumber: 162,
+                                        columnNumber: 21
+                                    }, this)
+                                }, void 0, false, {
                                     fileName: "[project]/components/chat/VoiceRecorder.tsx",
-                                    lineNumber: 165,
+                                    lineNumber: 144,
                                     columnNumber: 17
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/chat/VoiceRecorder.tsx",
-                            lineNumber: 158,
+                            lineNumber: 140,
+                            columnNumber: 15
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                            className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["cn"])("text-center text-[13px]", error ? "text-red-400" : disabled ? "text-slate-300" : "text-slate-400"),
+                            children: error ? error : disabled ? "Procesando respuesta..." : "Presioná para grabar el mensaje"
+                        }, void 0, false, {
+                            fileName: "[project]/components/chat/VoiceRecorder.tsx",
+                            lineNumber: 168,
                             columnNumber: 15
                         }, this)
                     ]
