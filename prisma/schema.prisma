@@ -1,0 +1,187 @@
+// GastroFlow — Prisma Schema
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── Auth.js (NextAuth v5) Adapter Models ─────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ─── Core Application Models ──────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  role          UserRole  @default(PATIENT)
+  phone         String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  accounts             Account[]
+  sessions             Session[]
+  patientConsultations Consultation[] @relation("PatientConsultations")
+  doctorConsultations  Consultation[] @relation("DoctorConsultations")
+  payments             Payment[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  PATIENT
+  DOCTOR
+  ADMIN
+}
+
+model Consultation {
+  id        String             @id @default(cuid())
+  patientId String             @map("patient_id")
+  doctorId  String?            @map("doctor_id")
+  status    ConsultationStatus @default(PENDING_CHAT)
+
+  // Chat progression (0 = not started, 1–4 = active stages, 5 = submitted)
+  stage Int @default(0)
+
+  // AI-generated structured summary (stored as JSON)
+  aiSummary Json? @map("ai_summary")
+
+  // Red flags detected by AI — triggers immediate ER referral
+  redFlags String[] @map("red_flags")
+
+  // Doctor's clinical response
+  diagnosis    String?
+  prescription Json?   // [{drug, dose, frequency, duration, notes}]
+  instructions String? @db.Text @map("instructions")
+  videoUrl     String? @map("video_url")
+
+  // Timestamps
+  chatStartedAt   DateTime? @map("chat_started_at")
+  chatCompletedAt DateTime? @map("chat_completed_at")
+  reviewedAt      DateTime? @map("reviewed_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  patient   User      @relation("PatientConsultations", fields: [patientId], references: [id])
+  doctor    User?     @relation("DoctorConsultations", fields: [doctorId], references: [id])
+  messages  Message[]
+  payment   Payment?  @relation(fields: [paymentId], references: [id])
+  paymentId String?   @unique @map("payment_id")
+
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([status])
+  @@map("consultations")
+}
+
+enum ConsultationStatus {
+  PENDING_PAYMENT  // Awaiting MercadoPago confirmation
+  PENDING_CHAT     // Paid — chat not yet started
+  IN_PROGRESS      // Active chat session
+  PENDING_REVIEW   // Chat complete — awaiting doctor review (<3 min SLA)
+  APPROVED         // Doctor approved + prescription sent
+  REFERRED         // Doctor escalated to videocall / in-person
+  CANCELLED
+  RED_FLAG         // AI safety gate triggered — routed to ER
+}
+
+model Message {
+  id             String      @id @default(cuid())
+  consultationId String      @map("consultation_id")
+  role           MessageRole
+
+  // Text content — for voice messages this is the Gemini transcription
+  content      String  @db.Text
+  isVoice      Boolean @default(false) @map("is_voice")
+  durationSecs Int?    @map("duration_secs")
+
+  // Original audio is NOT persisted (cost/privacy) — only transcription is stored
+  createdAt DateTime @default(now()) @map("created_at")
+
+  consultation Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+
+  @@index([consultationId])
+  @@map("messages")
+}
+
+enum MessageRole {
+  AI
+  PATIENT
+  DOCTOR
+}
+
+model Payment {
+  id        String        @id @default(cuid())
+  userId    String        @map("user_id")
+  amountARS Float         @map("amount_ars")
+  status    PaymentStatus @default(PENDING)
+
+  // MercadoPago fields
+  mpPaymentId String? @unique @map("mp_payment_id")
+  mpStatus    String? @map("mp_status")
+  mpDetail    Json?   @map("mp_detail") // Full MP webhook payload for audit
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id])
+  consultation Consultation?
+
+  @@index([userId])
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REFUNDED
+  IN_MEDIATION
+}
