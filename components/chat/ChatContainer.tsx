@@ -11,14 +11,14 @@ import type { ChatMessage } from "@/types";
 // ─── Scripted AI conversation ──────────────────────────────────────────────────
 
 const AI_QUESTIONS = [
-  "¡Hola! Soy el asistente médico de GastroFlow 👋\n\nEstoy aquí para ayudarte con tu consulta gastroenterológica de forma rápida y segura. Todo lo que compartas es confidencial.\n\n¿Cuál es el síntoma principal que te trajo hoy?",
-  "Gracias por contarme eso. ¿Desde cuándo tenés estos síntomas? ¿Son constantes o aparecen y desaparecen? Podés describirlos con tus propias palabras.",
-  "Entendido. ¿Estás tomando algún medicamento actualmente? ¿Tenés alergias conocidas a medicamentos o alimentos que el médico deba saber?",
+  "¡Hola! Estoy aquí para ayudarte con tu consulta de forma rápida y segura. Todo lo que compartas es confidencial.\n\n¿Cuál es el síntoma principal que te trajo hoy?",
+  "Gracias por contarme eso. ¿Desde cuándo tenés estos síntomas? ¿Son constantes o aparecen y desaparecen?",
+  "Entendido. ¿Estás tomando algún medicamento actualmente? ¿Tenés alergias conocidas a medicamentos o alimentos?",
   "Casi terminamos. ¿Tenés algún antecedente médico relevante? Por ejemplo, cirugías previas, enfermedades crónicas o consultas recientes por este mismo motivo.",
 ];
 
 const AI_FINAL =
-  "Perfecto, recibí toda la información que necesitaba. ✅\n\nAhora estoy procesando tu consulta. En breve un médico especialista la revisará — normalmente esto toma menos de 3 minutos.\n\nTe notificaremos por la app y por email cuando tengamos novedades. 🩺";
+  "Perfecto, recibí toda la información que necesitaba. ✅\n\nAhora estoy procesando tu consulta. En breve un médico especialista la revisará — normalmente toma menos de 3 minutos.\n\nTe notificaremos cuando tengamos novedades. 🩺";
 
 // ─── Typing indicator ─────────────────────────────────────────────────────────
 
@@ -31,7 +31,7 @@ function TypingIndicator() {
       transition={{ duration: 0.18 }}
       className="flex justify-start px-1"
     >
-      <div className="rounded-2xl rounded-tl-[4px] bg-white px-4 py-3 shadow-sm">
+      <div className="rounded-2xl rounded-tl-[4px] bg-white px-4 py-3 shadow-sm ring-1 ring-cream-300">
         <div className="flex items-end gap-[5px] h-4">
           {[0, 1, 2].map((i) => (
             <motion.span
@@ -57,10 +57,10 @@ function TypingIndicator() {
 function CompletionCard() {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9, y: 8 }}
+      initial={{ opacity: 0, scale: 0.92, y: 8 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: 0.35, type: "spring", stiffness: 280, damping: 22 }}
-      className="mx-auto mt-3 flex max-w-xs flex-col items-center gap-2 rounded-2xl bg-white px-6 py-5 text-center shadow-sm"
+      transition={{ duration: 0.3, type: "spring", stiffness: 280, damping: 22 }}
+      className="mx-auto mt-2 flex max-w-xs flex-col items-center gap-2 rounded-2xl bg-white px-6 py-5 text-center shadow-sm ring-1 ring-cream-300"
     >
       <span className="text-3xl">🩺</span>
       <div>
@@ -89,6 +89,7 @@ export function ChatContainer() {
   const [isAiResponding, setIsAiResponding] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const hasMessages = messages.length > 0 || isAiResponding;
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
@@ -103,29 +104,25 @@ export function ChatContainer() {
     scrollToBottom();
   }, [messages, isAiResponding, scrollToBottom]);
 
-  const addAiMessage = useCallback(
-    (content: string, typingDelay = 1600) => {
-      setIsAiResponding(true);
-      const timer = setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: crypto.randomUUID(),
-            role: "ai",
-            type: "text",
-            content,
-            waveform: [],
-            timestamp: new Date(),
-          },
-        ]);
-        setIsAiResponding(false);
-      }, typingDelay);
-      return timer;
-    },
-    []
-  );
+  const addAiMessage = useCallback((content: string, typingDelay = 1600) => {
+    setIsAiResponding(true);
+    const timer = setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          role: "ai",
+          type: "text",
+          content,
+          waveform: [],
+          timestamp: new Date(),
+        },
+      ]);
+      setIsAiResponding(false);
+    }, typingDelay);
+    return timer;
+  }, []);
 
-  // Show opening AI message on first render
   useEffect(() => {
     const t = setTimeout(() => {
       addAiMessage(AI_QUESTIONS[0], 900);
@@ -138,19 +135,20 @@ export function ChatContainer() {
       const nextStage = stage + 1;
       const msgId = crypto.randomUUID();
 
-      const userMsg: ChatMessage = {
-        id: msgId,
-        role: "user",
-        type: "voice",
-        content: "",
-        duration,
-        audioBlob,
-        audioUrl,
-        waveform: generateWaveform(msgId),
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, userMsg]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: msgId,
+          role: "user",
+          type: "voice",
+          content: "",
+          duration,
+          audioBlob,
+          audioUrl,
+          waveform: generateWaveform(msgId),
+          timestamp: new Date(),
+        },
+      ]);
       setStage(nextStage);
 
       if (nextStage < 4) {
@@ -164,44 +162,72 @@ export function ChatContainer() {
   );
 
   return (
-    <div className="flex h-dvh max-w-lg flex-col mx-auto">
+    <div
+      className="flex h-dvh max-w-lg flex-col mx-auto"
+      style={{
+        backgroundColor: "#F9F6EF",
+        backgroundImage:
+          "radial-gradient(circle, rgba(0,0,0,0.045) 1px, transparent 1px)",
+        backgroundSize: "20px 20px",
+      }}
+    >
+      {/* Header */}
       <ChatHeader stage={stage} totalStages={4} isComplete={isComplete} />
 
-      {/* ── Chat messages area ──────────────────────────────── */}
+      {/* Title section — visible when no messages yet */}
+      <AnimatePresence>
+        {!hasMessages && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="px-6 pt-8 pb-2"
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-500 mb-2">
+              Nueva consulta
+            </p>
+            <h2 className="text-[26px] font-semibold leading-[1.2] tracking-tight text-slate-900">
+              Consulta gastroenterológica online
+            </h2>
+            <p className="mt-2 text-[13px] text-slate-400 leading-relaxed">
+              Respondé 4 preguntas por voz y un médico especialista
+              revisará tu caso en menos de 3 minutos.
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Messages area */}
       <div
         ref={scrollRef}
-        className="chat-scroll flex-1 overflow-y-auto space-y-2 px-2 py-3"
-        style={{ backgroundColor: "var(--chat-bg)" }}
+        className="chat-scroll flex-1 overflow-y-auto space-y-2 px-3 py-3"
       >
-        {/* Date chip */}
-        <div className="flex justify-center">
-          <span className="rounded-full bg-black/10 px-3 py-1 text-[11px] font-medium text-white/90 backdrop-blur-sm">
-            Hoy
-          </span>
-        </div>
+        {/* Date chip — only once there are messages */}
+        {hasMessages && (
+          <div className="flex justify-center mb-1">
+            <span className="rounded-full bg-black/8 px-3 py-1 text-[11px] font-medium text-slate-500">
+              Hoy
+            </span>
+          </div>
+        )}
 
         <AnimatePresence initial={false}>
           {messages.map((msg) => (
             <ChatBubble key={msg.id} message={msg} />
           ))}
-
           {isAiResponding && <TypingIndicator key="typing-indicator" />}
         </AnimatePresence>
 
         {isComplete && <CompletionCard />}
 
-        {/* Scroll anchor */}
-        <div className="h-2" />
+        <div className="h-1" />
       </div>
 
-      {/* ── Input area ──────────────────────────────────────── */}
+      {/* Input / recorder */}
       {!isComplete ? (
-        <VoiceRecorder
-          onSend={handleVoiceSend}
-          disabled={isAiResponding}
-        />
+        <VoiceRecorder onSend={handleVoiceSend} disabled={isAiResponding} />
       ) : (
-        <div className="border-t border-slate-100 bg-white px-4 py-3 pb-safe text-center">
+        <div className="border-t border-cream-300 bg-cream-100 px-4 py-3 pb-safe text-center">
           <p className="text-[12px] text-slate-400">
             Te avisaremos cuando el médico complete tu consulta
           </p>

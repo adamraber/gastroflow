@@ -5,9 +5,10 @@
 @layer base {
   :root {
     --radius: 0.75rem;
-    --chat-bg: #e8ecf0;
+    --chat-bg: #F0EBE0;
     --bubble-ai: #ffffff;
-    --bubble-user: #d1fae5;
+    --bubble-user: #dbeafe;
+    --cream: #F9F6EF;
   }
 
   html {
@@ -15,8 +16,8 @@
   }
 
   body {
-    background-color: #f8fafc;
-    color: #0f172a;
+    background-color: var(--cream);
+    color: #111827;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;

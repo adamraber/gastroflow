@@ -15,31 +15,20 @@ export function ChatBubble({ message }: ChatBubbleProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8, scale: 0.97 }}
+      initial={{ opacity: 0, y: 10, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
+      transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
       className={cn("flex w-full px-1", isUser ? "justify-end" : "justify-start")}
     >
       <div
         className={cn(
-          "relative max-w-[78%] rounded-2xl shadow-sm",
+          "relative max-w-[78%] rounded-2xl",
           isUser
-            ? "rounded-tr-[4px] bg-brand-100 text-slate-900"
-            : "rounded-tl-[4px] bg-white text-slate-900"
+            ? "rounded-tr-[4px] bg-brand-100 text-slate-900 shadow-sm"
+            : "rounded-tl-[4px] bg-white text-slate-800 shadow-sm ring-1 ring-cream-300"
         )}
       >
-        {/* Bubble tail */}
-        {isUser ? (
-          <span className="absolute -right-[6px] top-0 h-3 w-3 overflow-hidden">
-            <span className="absolute left-0 top-0 h-3 w-3 origin-top-left rotate-0 bg-brand-100" />
-          </span>
-        ) : (
-          <span className="absolute -left-[6px] top-0 h-3 w-3 overflow-hidden">
-            <span className="absolute right-0 top-0 h-3 w-3 origin-top-right rotate-0 bg-white" />
-          </span>
-        )}
-
-        <div className="px-3 py-2">
+        <div className="px-3.5 py-2.5">
           {message.type === "voice" ? (
             <div className="py-0.5">
               <VoiceMessage
@@ -50,23 +39,23 @@ export function ChatBubble({ message }: ChatBubbleProps) {
               />
             </div>
           ) : (
-            <p className="text-[14.5px] leading-[1.55] whitespace-pre-line break-words">
+            <p className="text-[14px] leading-[1.6] whitespace-pre-line break-words font-[430]">
               {message.content}
             </p>
           )}
 
-          {/* Timestamp row */}
+          {/* Timestamp */}
           <div
             className={cn(
-              "mt-[3px] flex items-center gap-1",
+              "mt-1 flex items-center gap-1",
               isUser ? "justify-end" : "justify-start"
             )}
           >
-            <span className="text-[10px] leading-none text-slate-400 tabular-nums">
+            <span className="text-[10px] tabular-nums text-slate-400">
               {formatTime(message.timestamp)}
             </span>
             {isUser && (
-              <CheckCheck className="h-3 w-3 flex-shrink-0 text-brand-600" />
+              <CheckCheck className="h-3 w-3 flex-shrink-0 text-brand-500" />
             )}
           </div>
         </div>
