@@ -144,6 +144,14 @@ export function useVoiceRecorder() {
     setState((s) => ({ ...s, audioBlob: null, audioUrl: null, duration: 0 }));
   }, []);
 
+  // Resets state after sending without revoking the URL
+  // (the message bubble keeps the URL alive for playback)
+  const resetAfterSend = useCallback(() => {
+    audioUrlRef.current = null;
+    durationRef.current = 0;
+    setState((s) => ({ ...s, audioBlob: null, audioUrl: null, duration: 0 }));
+  }, []);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -159,6 +167,7 @@ export function useVoiceRecorder() {
     stopRecording,
     cancelRecording,
     clearAudio,
+    resetAfterSend,
     checkPermission,
   };
 }

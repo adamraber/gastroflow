@@ -22,7 +22,7 @@ export function VoiceRecorder({ onSend, disabled = false }: VoiceRecorderProps) 
     startRecording,
     stopRecording,
     cancelRecording,
-    clearAudio,
+    resetAfterSend,
     checkPermission,
   } = useVoiceRecorder();
 
@@ -42,7 +42,7 @@ export function VoiceRecorder({ onSend, disabled = false }: VoiceRecorderProps) 
   useEffect(() => {
     if (audioBlob && audioUrl) {
       onSendRef.current(audioBlob, audioUrl, duration);
-      clearAudio();
+      resetAfterSend(); // reset state without revoking the URL — the bubble keeps it alive
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [audioBlob, audioUrl]);

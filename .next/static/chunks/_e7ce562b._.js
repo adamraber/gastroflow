@@ -783,6 +783,22 @@ function useVoiceRecorder() {
             }["useVoiceRecorder.useCallback[clearAudio]"]);
         }
     }["useVoiceRecorder.useCallback[clearAudio]"], []);
+    // Resets state after sending without revoking the URL
+    // (the message bubble keeps the URL alive for playback)
+    const resetAfterSend = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "useVoiceRecorder.useCallback[resetAfterSend]": ()=>{
+            audioUrlRef.current = null;
+            durationRef.current = 0;
+            setState({
+                "useVoiceRecorder.useCallback[resetAfterSend]": (s)=>({
+                        ...s,
+                        audioBlob: null,
+                        audioUrl: null,
+                        duration: 0
+                    })
+            }["useVoiceRecorder.useCallback[resetAfterSend]"]);
+        }
+    }["useVoiceRecorder.useCallback[resetAfterSend]"], []);
     // Cleanup on unmount
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "useVoiceRecorder.useEffect": ()=>{
@@ -804,10 +820,11 @@ function useVoiceRecorder() {
         stopRecording,
         cancelRecording,
         clearAudio,
+        resetAfterSend,
         checkPermission
     };
 }
-_s(useVoiceRecorder, "7xlw8cOmyZV9zXSIxW0RifD09vE=");
+_s(useVoiceRecorder, "EkQLf35I01ildGrlMItCf7pAl6g=");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }
@@ -840,7 +857,7 @@ var _s = __turbopack_context__.k.signature();
 function VoiceRecorder(param) {
     let { onSend, disabled = false } = param;
     _s();
-    const { isRecording, duration, audioBlob, audioUrl, error, hasPermission, startRecording, stopRecording, cancelRecording, clearAudio, checkPermission } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$useVoiceRecorder$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useVoiceRecorder"])();
+    const { isRecording, duration, audioBlob, audioUrl, error, hasPermission, startRecording, stopRecording, cancelRecording, resetAfterSend, checkPermission } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$useVoiceRecorder$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useVoiceRecorder"])();
     // Stable ref to avoid stale-closure issues in the effect
     const onSendRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(onSend);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
@@ -862,7 +879,7 @@ function VoiceRecorder(param) {
         "VoiceRecorder.useEffect": ()=>{
             if (audioBlob && audioUrl) {
                 onSendRef.current(audioBlob, audioUrl, duration);
-                clearAudio();
+                resetAfterSend(); // reset state without revoking the URL — the bubble keeps it alive
             }
         // eslint-disable-next-line react-hooks/exhaustive-deps
         }
@@ -1079,7 +1096,7 @@ function VoiceRecorder(param) {
         columnNumber: 5
     }, this);
 }
-_s(VoiceRecorder, "53B4h1In+2UFfLAHOoQPca7zv8Y=", false, function() {
+_s(VoiceRecorder, "YDmqjIyDseK1+uv+B5agiTnAeWs=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$useVoiceRecorder$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useVoiceRecorder"]
     ];
