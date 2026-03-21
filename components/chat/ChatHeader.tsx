@@ -4,19 +4,12 @@ import { motion } from "framer-motion";
 import { ArrowLeft, MoreVertical } from "lucide-react";
 
 interface ChatHeaderProps {
-  stage: number;
-  totalStages?: number;
   isComplete?: boolean;
   onBack?: () => void;
 }
 
-export function ChatHeader({
-  stage,
-  totalStages = 4,
-  isComplete = false,
-  onBack,
-}: ChatHeaderProps) {
-  const progressRatio = isComplete ? 1 : stage / totalStages;
+export function ChatHeader({ isComplete = false, onBack }: ChatHeaderProps) {
+  const progressRatio = isComplete ? 1 : 0;
 
   return (
     <header className="sticky top-0 z-50 bg-cream-50 border-b border-cream-300">
@@ -44,19 +37,13 @@ export function ChatHeader({
         </div>
 
         <div className="flex items-center gap-2">
-          {!isComplete ? (
-            <motion.span
-              key={stage}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 380, damping: 22 }}
-              className="rounded-full border border-brand-200 bg-brand-50 px-2.5 py-1 text-[11px] font-medium text-brand-700"
-            >
-              {stage} / {totalStages}
-            </motion.span>
-          ) : (
+          {isComplete ? (
             <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
               Listo
+            </span>
+          ) : (
+            <span className="rounded-full border border-brand-200 bg-brand-50 px-2.5 py-1 text-[11px] font-medium text-brand-700">
+              En consulta
             </span>
           )}
           <button className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-cream-200 transition-colors">

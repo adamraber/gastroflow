@@ -38,6 +38,21 @@ export interface AiSummary {
   redFlags: string[];
 }
 
+export interface MedicalSummary {
+  motivo: string;
+  localizacion_dolor: string;
+  duracion: string;
+  peso_y_sueno: string;
+  otros_sintomas: string[];
+  banderas_rojas_detectadas: boolean;
+  resumen_ejecutivo: string;
+}
+
+export interface ConversationMessage {
+  role: "user" | "model";
+  content: string;
+}
+
 export interface PrescriptionItem {
   drug: string;
   dose: string;
