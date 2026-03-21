@@ -130,6 +130,23 @@ export function ChatContainer() {
     return () => clearTimeout(t);
   }, [addAiMessage]);
 
+  const transcribeAudio = useCallback(async (audioBlob: Blob, msgId: string) => {
+    try {
+      const formData = new FormData();
+      formData.append("audio", audioBlob, "recording.webm");
+      const res = await fetch("/api/transcribe", { method: "POST", body: formData });
+      if (!res.ok) return;
+      const { transcription } = await res.json() as { transcription: string };
+      if (transcription) {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === msgId ? { ...m, content: transcription } : m))
+        );
+      }
+    } catch {
+      // transcription is optional — don't break the flow on failure
+    }
+  }, []);
+
   const handleVoiceSend = useCallback(
     (audioBlob: Blob, audioUrl: string, duration: number) => {
       const nextStage = stage + 1;
@@ -151,6 +168,9 @@ export function ChatContainer() {
       ]);
       setStage(nextStage);
 
+      // Transcribe in background — updates message when ready
+      transcribeAudio(audioBlob, msgId);
+
       if (nextStage < 4) {
         addAiMessage(AI_QUESTIONS[nextStage], 2000);
       } else {
@@ -158,7 +178,7 @@ export function ChatContainer() {
         setTimeout(() => setIsComplete(true), 2400 + 800);
       }
     },
-    [stage, addAiMessage]
+    [stage, addAiMessage, transcribeAudio]
   );
 
   return (

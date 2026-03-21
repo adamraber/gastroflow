@@ -37,6 +37,16 @@ export function ChatBubble({ message }: ChatBubbleProps) {
                 audioUrl={message.audioUrl}
                 isUser={isUser}
               />
+              {/* Transcripción — aparece cuando Gemini responde */}
+              {message.content ? (
+                <p className="mt-1.5 text-[12px] leading-snug text-slate-500 italic">
+                  &ldquo;{message.content}&rdquo;
+                </p>
+              ) : (
+                <p className="mt-1.5 text-[11px] text-slate-300 italic">
+                  Transcribiendo...
+                </p>
+              )}
             </div>
           ) : (
             <p className="text-[14px] leading-[1.6] whitespace-pre-line break-words font-[430]">

@@ -57,10 +57,10 @@ export function VoiceRecorder({ onSend, disabled = false }: VoiceRecorderProps) 
       {/* Input box — styled like the screenshot */}
       <div
         className={cn(
-          "rounded-2xl border bg-white shadow-sm transition-all duration-200",
+          "rounded-2xl border bg-white shadow-sm transition-all duration-200 hover:border-2 hover:border-brand-600",
           isRecording
-            ? "border-red-200 shadow-red-100"
-            : "border-cream-300 shadow-cream-200"
+            ? "border-cream-300"
+            : "border-cream-300"
         )}
       >
         <AnimatePresence mode="wait" initial={false}>
@@ -79,7 +79,7 @@ export function VoiceRecorder({ onSend, disabled = false }: VoiceRecorderProps) 
                 {Array.from({ length: 28 }).map((_, i) => (
                   <motion.div
                     key={i}
-                    className="w-[3px] rounded-full bg-red-400"
+                    className="w-[3px] rounded-full bg-slate-400"
                     animate={{
                       height: ["4px", `${8 + Math.random() * 24}px`, "4px"],
                     }}
@@ -108,14 +108,14 @@ export function VoiceRecorder({ onSend, disabled = false }: VoiceRecorderProps) 
                 {/* Info — centro */}
                 <div className="flex flex-1 items-center justify-center gap-2">
                   <motion.span
-                    className="h-2 w-2 rounded-full bg-red-400"
+                    className="h-2 w-2 rounded-full bg-slate-400"
                     animate={{ opacity: [1, 0.2, 1] }}
                     transition={{ duration: 1, repeat: Infinity }}
                   />
-                  <span className="text-[13px] font-medium text-red-500">
+                  <span className="text-[13px] font-medium text-slate-500">
                     Grabando...
                   </span>
-                  <span className="font-mono text-[13px] font-semibold tabular-nums text-red-400">
+                  <span className="font-mono text-[13px] font-semibold tabular-nums text-slate-500">
                     {formatDuration(duration)}
                   </span>
                 </div>
