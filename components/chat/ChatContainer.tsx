@@ -133,17 +133,26 @@ export function ChatContainer() {
   const transcribeAudio = useCallback(async (audioBlob: Blob, msgId: string) => {
     try {
       const formData = new FormData();
-      formData.append("audio", audioBlob, "recording.webm");
+      formData.append("audio", new File([audioBlob], "recording.webm", { type: audioBlob.type }));
+
       const res = await fetch("/api/transcribe", { method: "POST", body: formData });
-      if (!res.ok) return;
-      const { transcription } = await res.json() as { transcription: string };
-      if (transcription) {
+      const data = await res.json() as { transcription?: string; error?: string };
+
+      if (!res.ok || data.error) {
+        console.error("[transcribe] API error:", data.error);
         setMessages((prev) =>
-          prev.map((m) => (m.id === msgId ? { ...m, content: transcription } : m))
+          prev.map((m) => (m.id === msgId ? { ...m, content: "(no se pudo transcribir)" } : m))
+        );
+        return;
+      }
+
+      if (data.transcription) {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === msgId ? { ...m, content: data.transcription! } : m))
         );
       }
-    } catch {
-      // transcription is optional — don't break the flow on failure
+    } catch (err) {
+      console.error("[transcribe] fetch error:", err);
     }
   }, []);
 
