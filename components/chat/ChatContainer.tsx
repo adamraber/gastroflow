@@ -100,72 +100,77 @@ export function ChatContainer() {
     return await res.json() as { reply: string; summary: MedicalSummary | null };
   }, []);
 
+  const addAiMessage = useCallback((content: string) => {
+    setMessages((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), role: "ai", type: "text", content, waveform: [], timestamp: new Date() },
+    ]);
+  }, []);
+
   // ── Handle voice send ─────────────────────────────────────────────────────
   const handleVoiceSend = useCallback(async (audioBlob: Blob, audioUrl: string, duration: number) => {
     const msgId = crypto.randomUUID();
     setIsAiResponding(true);
 
-    // 1. Add voice bubble immediately
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: msgId,
-        role: "user",
-        type: "voice",
-        content: "",
-        duration,
-        audioBlob,
-        audioUrl,
-        waveform: generateWaveform(msgId),
-        timestamp: new Date(),
-      },
-    ]);
-
-    // 2. Transcribe (blocks until done)
-    const transcription = await transcribeAudio(audioBlob);
-
-    // 3. Update bubble with transcription
-    if (transcription) {
-      setMessages((prev) =>
-        prev.map((m) => (m.id === msgId ? { ...m, content: transcription } : m))
-      );
-    }
-
-    // 4. Add user message to history
-    const updatedHistory: ConversationMessage[] = [
-      ...history,
-      { role: "user", content: transcription || "[audio sin transcripción]" },
-    ];
-    setHistory(updatedHistory);
-
-    // 5. Call Gemini chat
-    const { reply, summary: detectedSummary } = await callChat(updatedHistory);
-
-    // 6. Show AI reply (the patient-facing message)
-    if (reply) {
-      const aiId = crypto.randomUUID();
+    try {
+      // 1. Add voice bubble immediately
       setMessages((prev) => [
         ...prev,
         {
-          id: aiId,
-          role: "ai",
-          type: "text",
-          content: reply,
-          waveform: [],
+          id: msgId,
+          role: "user",
+          type: "voice",
+          content: "",
+          duration,
+          audioBlob,
+          audioUrl,
+          waveform: generateWaveform(msgId),
           timestamp: new Date(),
         },
       ]);
-      setHistory((prev) => [...prev, { role: "model", content: reply }]);
-    }
 
-    // 7. Handle summary → switch to confirmation
-    if (detectedSummary) {
-      setSummary(detectedSummary);
-      setTimeout(() => setScreen("confirmation"), reply ? 2500 : 500);
-    }
+      // 2. Transcribe
+      const transcription = await transcribeAudio(audioBlob);
+      if (transcription) {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === msgId ? { ...m, content: transcription } : m))
+        );
+      }
 
-    setIsAiResponding(false);
-  }, [history, transcribeAudio, callChat]);
+      // 3. Build updated history and call Gemini
+      const updatedHistory: ConversationMessage[] = [
+        ...history,
+        { role: "user", content: transcription || "[audio]" },
+      ];
+      setHistory(updatedHistory);
+
+      const data = await callChat(updatedHistory);
+
+      if ("error" in data && data.error) {
+        addAiMessage(`Hubo un error al procesar tu consulta: ${data.error}`);
+        return;
+      }
+
+      const { reply, summary: detectedSummary } = data as { reply: string; summary: MedicalSummary | null };
+
+      // 4. Show AI reply
+      if (reply) {
+        addAiMessage(reply);
+        setHistory((prev) => [...prev, { role: "model", content: reply }]);
+      }
+
+      // 5. Handle summary
+      if (detectedSummary) {
+        setSummary(detectedSummary);
+        setTimeout(() => setScreen("confirmation"), reply ? 2500 : 500);
+      }
+    } catch (err) {
+      console.error("[handleVoiceSend]", err);
+      addAiMessage("Ocurrió un error inesperado. Por favor intentá de nuevo.");
+    } finally {
+      setIsAiResponding(false);
+    }
+  }, [history, transcribeAudio, callChat, addAiMessage]);
 
   // ── Screens ───────────────────────────────────────────────────────────────
 

@@ -70,8 +70,9 @@ export async function POST(request: Request) {
       parts: [{ text: m.content }],
     }));
 
+    const model = "gemini-2.0-flash";
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -92,8 +93,9 @@ export async function POST(request: Request) {
     };
 
     if (!res.ok) {
-      console.error("[chat] Gemini error:", data.error?.message);
-      return NextResponse.json({ error: data.error?.message ?? "Error de Gemini" }, { status: res.status });
+      const errMsg = data.error?.message ?? "Error de Gemini";
+      console.error("[chat] Gemini error:", errMsg);
+      return NextResponse.json({ error: errMsg }, { status: res.status });
     }
 
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
