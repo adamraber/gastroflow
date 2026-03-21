@@ -9,14 +9,15 @@ function sanitizeMimeType(raw: string): string {
 // Models to try in order — stops at first success
 const MODELS = [
   "gemini-2.0-flash",
+  "gemini-2.0-flash-001",
   "gemini-2.0-flash-lite",
   "gemini-1.5-flash",
-  "gemini-1.5-flash-latest",
-  "gemini-1.5-flash-002",
+  "gemini-1.5-flash-001",
 ];
 
 async function callGemini(model: string, mimeType: string, base64: string): Promise<string> {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+  // Try v1 first, fall back to v1beta
+  const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
   const res = await fetch(url, {
     method: "POST",
@@ -72,8 +73,9 @@ export async function POST(request: Request) {
       } catch (err) {
         lastError = err instanceof Error ? err.message : String(err);
         console.warn(`[transcribe] failed ${model}:`, lastError);
-        // Only keep trying on 404 (model not found) — stop on other errors
-        if (!lastError.includes("[404]")) break;
+        // Continue trying next model on 404 or 429
+        const shouldRetry = lastError.includes("[404]") || lastError.includes("[429]");
+        if (!shouldRetry) break;
       }
     }
 
