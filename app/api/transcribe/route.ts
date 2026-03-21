@@ -1,7 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 function sanitizeMimeType(raw: string): string {
   const base = raw.split(";")[0].trim();
@@ -9,10 +6,47 @@ function sanitizeMimeType(raw: string): string {
   return supported.includes(base) ? base : "audio/webm";
 }
 
+// Models to try in order — stops at first success
+const MODELS = [
+  "gemini-2.0-flash",
+  "gemini-2.0-flash-lite",
+  "gemini-1.5-flash",
+  "gemini-1.5-flash-latest",
+  "gemini-1.5-flash-002",
+];
+
+async function callGemini(model: string, mimeType: string, base64: string): Promise<string> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{
+        parts: [
+          { inlineData: { mimeType, data: base64 } },
+          { text: "Transcribí este audio en español rioplatense. Devolvé únicamente el texto transcripto, sin comillas ni comentarios." },
+        ],
+      }],
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    const msg = (err as { error?: { message?: string } })?.error?.message ?? res.statusText;
+    throw new Error(`[${res.status}] ${model}: ${msg}`);
+  }
+
+  const data = await res.json() as {
+    candidates?: { content?: { parts?: { text?: string }[] } }[];
+  };
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+  return text.trim();
+}
+
 export async function POST(request: Request) {
   if (!process.env.GEMINI_API_KEY) {
-    console.error("[transcribe] GEMINI_API_KEY no está configurada");
-    return NextResponse.json({ error: "API key no configurada." }, { status: 500 });
+    return NextResponse.json({ error: "GEMINI_API_KEY no configurada." }, { status: 500 });
   }
 
   try {
@@ -29,19 +63,21 @@ export async function POST(request: Request) {
 
     console.log("[transcribe] size:", audioFile.size, "mimeType:", mimeType);
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    let lastError = "";
+    for (const model of MODELS) {
+      try {
+        const transcription = await callGemini(model, mimeType, base64);
+        console.log(`[transcribe] success with ${model}:`, transcription);
+        return NextResponse.json({ transcription, model });
+      } catch (err) {
+        lastError = err instanceof Error ? err.message : String(err);
+        console.warn(`[transcribe] failed ${model}:`, lastError);
+        // Only keep trying on 404 (model not found) — stop on other errors
+        if (!lastError.includes("[404]")) break;
+      }
+    }
 
-    const result = await model.generateContent([
-      {
-        inlineData: { mimeType, data: base64 },
-      },
-      "Transcribí este audio en español rioplatense. Devolvé únicamente el texto transcripto, sin comillas ni comentarios adicionales.",
-    ]);
-
-    const transcription = result.response.text().trim();
-    console.log("[transcribe] ok:", transcription);
-
-    return NextResponse.json({ transcription });
+    return NextResponse.json({ error: lastError }, { status: 500 });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error("[transcribe] error:", msg);
