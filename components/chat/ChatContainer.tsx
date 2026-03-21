@@ -141,7 +141,7 @@ export function ChatContainer() {
       if (!res.ok || data.error) {
         console.error("[transcribe] API error:", data.error);
         setMessages((prev) =>
-          prev.map((m) => (m.id === msgId ? { ...m, content: "(no se pudo transcribir)" } : m))
+          prev.map((m) => (m.id === msgId ? { ...m, content: `⚠️ ${data.error ?? "Error"}` } : m))
         );
         return;
       }
